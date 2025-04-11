@@ -9,7 +9,6 @@ class TelegramUser(models.Model):
 class Wish(models.Model):
     title = models.CharField(max_length=128)
     description = models.TextField(null=True, blank=True)
-    # photo задел на будущее
     link = models.TextField(null=True, blank=True)
     price = models.IntegerField(null=True, blank=True)
     owner = models.ForeignKey(TelegramUser, on_delete=models.CASCADE)
