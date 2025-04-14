@@ -60,7 +60,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'wish_list.wsgi.application'
 
 
-if os.getenv('SQLITE_TURN', False) == 'True':
+if os.getenv('SQLITE_TURN') == 'True':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',

@@ -1,6 +1,5 @@
 import re
 import requests
-# import json
 
 from constants import TELEGRAM_USERS_URL, WISHES_URL
 from text_constants import (
