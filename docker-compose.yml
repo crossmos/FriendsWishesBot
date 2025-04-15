@@ -2,6 +2,7 @@ version: '3'
 
 volumes:
   pg_wish_list_data:
+  static:
 
 services:
   db:
@@ -19,6 +20,8 @@ services:
     depends_on: 
       - db 
     env_file: .env
+    volumes: 
+      - static:/backend_static
     ports: 
       - 80:80 
   nginx: 
@@ -26,5 +29,7 @@ services:
       depends_on:
         - api-backend 
       env_file: .env 
+      volumes:
+        - static:/staticfiles
       ports: 
         - 8000:80 
