@@ -15,16 +15,13 @@ from keyboards import (
     manage_wishes_keyboard,
     main_keyboard,
     update_parametr_keyboard,
-    # update_confirm_keyboard,
     wish_list_keyboard,
 )
 from utils import (
     add_wish,
     bot,
-    # delete_message,
     delete_wish,
     edit_message,
-    # edit_wish,
     edit_keyboard,
     get_about_text,
     get_friend_text,
@@ -36,6 +33,7 @@ from utils import (
     get_wish_data,
     get_wishes_ids,
     send_message,
+    update_parametr,
 )
 
 
@@ -138,12 +136,12 @@ def cancel_button_handler(callback):
 def delete_confirm_handler(callback):
     wish_id = get_wish_id(callback=callback)
     wish = get_wish(wish_id)
-    result_message = 'Удалить это желание?\n' + '\n'.join(
-        [item for item in get_wish_data(wish)]
+    text = 'Удалить это желание?\n' + '\n'.join(
+        [item for index, item in enumerate(get_wish_data(wish))]
     )
     edit_message(
         callback=callback,
-        text=result_message,
+        text=text,
         keyboard=delete_confirm_keyboard(wish_id)
     )
 
@@ -165,7 +163,7 @@ def delete_handler(callback):
 @bot.callback_query_handler(
     func=lambda callback: re.search(r'^update\d+$', callback.data)
 )
-def choose_parametr_update_handler(callback):
+def update_choose_parametr_handler(callback):
     wish_id = get_wish_id(callback=callback)
     wish = get_wish(wish_id)
     text = '\n'.join(
@@ -177,23 +175,17 @@ def choose_parametr_update_handler(callback):
     )
 
 
-# @bot.callback_query_handler(
-#     func=lambda callback: re.search(r'update\w{5,12}\d+$', callback.data)
-# )
-# def confirm_update_wish_handler(callback):
-#     wish_id = ''.join(
-#         [letter for letter in callback.data if letter.isdigit()]
-#     )
-#     if callback.data.startswith('update_title'):
-#         msg = bot.send_message(
-#             chat_id=callback.message.chat.id,
-#             text=f"Введите новое название для {get_wish(wish_id)['title']}"
-#         )
-#         bot.register_next_step_handler(
-#             msg,
-#             edit_wish,
-#             wish_id=wish_id,
-#             update_parametr='title'
-#         )
+@bot.callback_query_handler(
+    func=lambda callback: re.search(r'update\w{5,12}\d+$', callback.data)
+)
+def update_handler(callback):
+    wish_id = str(get_wish_id(callback=callback))
+    wish = get_wish(wish_id)
+    parametr = callback.data.rsplit('update_', 1)[1].rstrip('0123456789')
 
-bot.polling(timeout=None)
+    update_parametr(
+        callback=callback, wish=wish, wish_id=wish_id, parametr=parametr
+    )
+
+
+bot.polling(non_stop=True, timeout=None)

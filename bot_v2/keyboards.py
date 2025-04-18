@@ -79,9 +79,8 @@ def delete_confirm_keyboard(wish_id):
 
 # Клавиатура выбора параметра редактирования
 def update_parametr_keyboard(wish_id):
-    update_parametrs_list_keyboard = types.InlineKeyboardMarkup(
-        row_width=2)
-    update_parametrs_list_keyboard.row(
+    update_parametr_keyboard = types.InlineKeyboardMarkup()
+    update_parametr_keyboard.row(
         types.InlineKeyboardButton(
             text='Название',
             callback_data='update_title' + str(wish_id)
@@ -91,7 +90,7 @@ def update_parametr_keyboard(wish_id):
             callback_data='update_description' + str(wish_id)
         )
     )
-    update_parametrs_list_keyboard.row(
+    update_parametr_keyboard.row(
         types.InlineKeyboardButton(
             text='Цена',
             callback_data='update_price' + str(wish_id)
@@ -101,13 +100,13 @@ def update_parametr_keyboard(wish_id):
             callback_data='update_link' + str(wish_id)
         )
     )
-    update_parametrs_list_keyboard.add(
+    update_parametr_keyboard.add(
         types.InlineKeyboardButton(
             text='Отменить',
             callback_data='cancel'
         )
     )
-    return update_parametrs_list_keyboard
+    return update_parametr_keyboard
 
 
 def update_confirm_keyboard(wish_id):

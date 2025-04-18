@@ -11,6 +11,7 @@ from text_constants import (
     ABOUT_TEXT, EMPTY_WISHES_TEXT,
     FRIENDS_LIST_TEXT, SUPPORT_TEXT
 )
+from keyboards import manage_wishes_keyboard
 
 
 load_dotenv(find_dotenv())
@@ -25,11 +26,12 @@ def send_message(
         message, text: str, keyboard: Optional[REPLY_MARKUP_TYPES] = None,
         bot: TeleBot = bot
 ):
-    bot.send_message(
+    msg = bot.send_message(
         chat_id=message.chat.id,
         text=text,
         reply_markup=keyboard
     )
+    return msg
 
 
 # Функция изменения сообщения
@@ -68,26 +70,32 @@ def delete_message(callback):
 # Функции для команд главной клавиатуры
 def get_owner_wishes_text(message) -> str:
     wishes = get_wishes(message)
+    wish_list = []
+    counter = 1
+
     if wishes:
-        wish_list = [wish['title'] for wish in wishes]
-        wish_list.reverse()
-        text = '\n'.join(
-            [f'{index+1}. {item}' for index,
-                item in enumerate(wish_list)]
-        )
+        for wish in wishes:
+            wish_list.append(f"{counter}. {wish['title']}")
+            if wish['price']:
+                wish_list.append(f"Цена: {wish['price']}")
+            counter += 1
+        text = '\n'.join(wish_list)
         return text
     return EMPTY_WISHES_TEXT
 
 
 def get_friend_wishes_text(message):
     wishes = get_wishes(message, is_owner=False)
+    counter = 1
     if wishes:
         text = ''
         for wish in wishes:
             wish = [
                 item for item in get_wish_data(wish)
             ]
-            text += '\n'.join(wish) + '\n'
+            text += (str(counter) + '. ' + '\n'.join(wish) + '\n'
+                     + '------------------------------------' + '\n')
+            counter += 1
         return text
     return f'У {message.text[1:]}, ещё нет желаний'
 
@@ -173,7 +181,7 @@ def get_wishes_ids(callback):
 
 def get_wish_data(wish):
     data = []
-    data.append(f"Название: {wish['title']}")
+    data.append(f"{wish['title']}")
     if wish['description']:
         data.append(f"Описание: {wish['description']}")
     if wish['price']:
@@ -181,3 +189,21 @@ def get_wish_data(wish):
     if wish['link']:
         data.append(f"Ссылка: {wish['link']}")
     return data
+
+
+def update_parametr(callback, wish, wish_id, parametr: str):
+    if callback.data.startswith(f'update_{parametr}'):
+        msg = send_message(
+            callback.message,
+            text='Введите новое значение'
+        )
+
+        def update(msg):
+            edit_wish(msg, wish_id=wish_id, update_parametr=parametr)
+            text = get_owner_wishes_text(msg)
+            send_message(msg, text=text, keyboard=manage_wishes_keyboard())
+
+        bot.register_next_step_handler(
+            msg,
+            update
+        )
