@@ -74,7 +74,7 @@ def get_owner_wishes_text(message) -> str:
     counter = 1
 
     if wishes:
-        for wish in wishes:
+        for wish in reversed(wishes):
             wish_list.append(f"{counter}. {wish['title']}")
             if wish['price']:
                 wish_list.append(f"Цена: {wish['price']}")

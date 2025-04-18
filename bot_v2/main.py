@@ -3,6 +3,7 @@ import requests
 
 from constants import TELEGRAM_USERS_URL  # WISHES_URL
 from text_constants import (
+    EMPTY_WISHES_TEXT,
     HELLO_TEXT,
     REGISTRY_REPLY_TEXT,
     GET_MY_WISH_LIST_TEXT,
@@ -75,10 +76,13 @@ def bot_management(message):
     if message.text in MAIN_KEYBOARD_COMMANDS:
         text = MAIN_KEYBOARD_COMMANDS[message.text](message)
         if message.text == GET_MY_WISH_LIST_TEXT:
-            send_message(
-                message=message, text=text,
-                keyboard=manage_wishes_keyboard()
-            )
+            if text != EMPTY_WISHES_TEXT:
+                send_message(
+                    message=message, text=text,
+                    keyboard=manage_wishes_keyboard()
+                )
+            else:
+                send_message(message=message, text=text)
         else:
             send_message(message=message, text=text)
 
