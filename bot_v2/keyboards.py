@@ -1,5 +1,6 @@
 from telebot import types
 
+
 from text_constants import (
     GET_MY_WISH_LIST_TEXT,
     GET_FRIEND_WISH_LIST_TEXT,
@@ -28,29 +29,34 @@ def manage_wishes_keyboard():
     manage_wishes_keyboard = types.InlineKeyboardMarkup()
     manage_wishes_keyboard.add(
         types.InlineKeyboardButton(
-            'Редактировать',
+            text='Редактировать',
             callback_data='update')
     )
     manage_wishes_keyboard.add(
         types.InlineKeyboardButton(
-            'Удалить',
+            text='Удалить',
             callback_data='delete'),
     )
     return manage_wishes_keyboard
 
 
-# Клавиатура выбора желания для действия
-def wish_list_keyboard(callback, wish_list):
-    wish_list_keyboard = types.InlineKeyboardMarkup(row_width=5)
-    # Тут надо как то отформотировать вид кнопок
-    # Чтобы было по 5 в ряду + "Отмена" в конце
-    for i in range(len(wish_list)):
-        wish_list_keyboard.add(types.InlineKeyboardButton(
-            i + 1, callback_data=callback.data + str(wish_list[i])))
+# Клавиатура со списком желаний
+def wish_list_keyboard(callback, wishes_ids):
+    wish_list_keyboard = types.InlineKeyboardMarkup()
+    wishes = []
 
+    for i in range(len(wishes_ids)):
+        wishes.append(types.InlineKeyboardButton(
+            text=i + 1, callback_data=callback.data + str(wishes_ids[i])
+        ))
+        if len(wishes) == 5:
+            wish_list_keyboard.row(*wishes)
+            wishes.clear()
+
+    wish_list_keyboard.row(*wishes)
     wish_list_keyboard.add(
         types.InlineKeyboardButton(
-            'Отменить',
+            text='Назад',
             callback_data='back'
         )
     )
@@ -58,55 +64,60 @@ def wish_list_keyboard(callback, wish_list):
 
 
 # Клавиатура подтверждения удаления
-def confirm_delete_keyboard(wish_id):
-    confirm_delete_keyboard = types.InlineKeyboardMarkup()
-    confirm_delete_keyboard.add(types.InlineKeyboardButton(
-        'Подтвердить удаление',
+def delete_confirm_keyboard(wish_id):
+    delete_confirm_keyboard = types.InlineKeyboardMarkup()
+    delete_confirm_keyboard.add(types.InlineKeyboardButton(
+        text='Удалить',
         callback_data='delete_confirm' + str(wish_id)
     ))
-    confirm_delete_keyboard.add(types.InlineKeyboardButton(
-        'Отмена', callback_data='confirm_back'))
-    return confirm_delete_keyboard
+    delete_confirm_keyboard.add(types.InlineKeyboardButton(
+        text='Отменить',
+        callback_data='cancel'
+    ))
+    return delete_confirm_keyboard
 
 
-def update_parametrs_list_keyboard(wish_id):
+# Клавиатура выбора параметра редактирования
+def update_parametr_keyboard(wish_id):
     update_parametrs_list_keyboard = types.InlineKeyboardMarkup(
         row_width=2)
     update_parametrs_list_keyboard.row(
         types.InlineKeyboardButton(
-            'Название',
+            text='Название',
             callback_data='update_title' + str(wish_id)
         ),
         types.InlineKeyboardButton(
-            'Описание',
+            text='Описание',
             callback_data='update_description' + str(wish_id)
         )
     )
     update_parametrs_list_keyboard.row(
         types.InlineKeyboardButton(
-            'Цена',
+            text='Цена',
             callback_data='update_price' + str(wish_id)
         ),
         types.InlineKeyboardButton(
-            'Ссылка',
+            text='Ссылка',
             callback_data='update_link' + str(wish_id)
         )
     )
     update_parametrs_list_keyboard.add(
         types.InlineKeyboardButton(
-            'Отменить',
-            callback_data='confirm_back'
+            text='Отменить',
+            callback_data='cancel'
         )
     )
     return update_parametrs_list_keyboard
 
 
-def confirm_update_keyboard(wish_id):
+def update_confirm_keyboard(wish_id):
     confirm_update_keyboard = types.InlineKeyboardMarkup()
     confirm_update_keyboard.add(types.InlineKeyboardButton(
-        'Подтвердить редактирование',
+        text='Подтвердить редактирование',
         callback_data='confirm_delete' + str(wish_id)
     ))
     confirm_update_keyboard.add(types.InlineKeyboardButton(
-        'Отмена', callback_data='confirm_back'))
+        text='Отмена',
+        callback_data='confirm_back'
+    ))
     return confirm_update_keyboard
